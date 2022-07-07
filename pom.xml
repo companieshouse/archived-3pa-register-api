@@ -18,6 +18,13 @@
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <skip.integration.tests>false</skip.integration.tests>
+        <skip.unit.tests>false</skip.unit.tests>
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.basedir}/target/site/jacoco/jacoco.xml,
+            ${project.basedir}/target/site/jacoco-it/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.jacoco.reports>${project.basedir}/target/site</sonar.jacoco.reports>
         <spring-boot-dependencies.version>2.7.1</spring-boot-dependencies.version>
         <spring-boot-maven-plugin.version>2.7.1</spring-boot-maven-plugin.version>
 	</properties>
@@ -74,11 +81,113 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <!--suppress UnresolvedMavenProperty -->
+                    <argLine>${surefireArgLine}</argLine>
+                    <skipTests>${skip.unit.tests}</skipTests>
+                    <!-- Excludes integration tests when unit tests are run. -->
+                    <includes>
+                        <!-- unit tests -->
+                        <include>**/*Test.java</include>
+                    </includes>
+                    <excludes>
+                        <!-- integration tests -->
+                        <exclude>**/*IT.java</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven-failsafe-plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.junit.jupiter</groupId>
+                        <artifactId>junit-jupiter-engine</artifactId>
+                        <version>5.8.2</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <environmentVariables>
+                        <!-- Add the config as required -->
+                    </environmentVariables>
+                    <!--suppress UnresolvedMavenProperty -->
+                    <argLine>${failsafeArgLine}</argLine>
+                    <skipITs>${skip.integration.tests}</skipITs>
+                    <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+                    <!-- Excludes unit tests when integration tests are run. -->
+                    <includes>
+                        <include>**/*IT.java</include>
+                    </includes>
+                    <excludes>
+                        <!-- unit tests -->
+                        <exclude>**/*Test.java</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>pre-unit-test</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Sets the path to the file which contains the execution model. -->
+                            <destFile>${sonar.jacoco.reports}/jacoco.exec</destFile>
+                            <propertyName>surefireArgLine</propertyName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <dataFile>${sonar.jacoco.reports}/jacoco.exec</dataFile>
+                            <outputDirectory>${sonar.jacoco.reports}/jacoco</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pre-integration-test</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Sets the path to the file which contains the execution model. -->
+                            <destFile>${sonar.jacoco.reports}/jacoco-it.exec</destFile>
+                            <propertyName>failsafeArgLine</propertyName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>post-integration-test</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <dataFile>${sonar.jacoco.reports}/jacoco-it.exec</dataFile>
+                            <outputDirectory>${sonar.jacoco.reports}/jacoco-it</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>${sonar-maven-plugin.version}</version>
             </plugin>
 		</plugins>
 	</build>
