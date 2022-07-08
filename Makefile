@@ -31,7 +31,11 @@ build:
 	cp ./target/$(artifact_name)-$(version).jar ./$(artifact_name).jar
 
 .PHONY: dist
-dist: clean build package
+dist: clean build package coverage
+
+.PHONY: coverage
+coverage:
+	mvn verify
 
 .PHONY: sonar
 sonar:
