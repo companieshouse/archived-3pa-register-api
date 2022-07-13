@@ -1,18 +1,14 @@
 package uk.gov.companieshouse.tpa.register.api.agent.model;
 
-import com.mongodb.client.model.Collation;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
@@ -36,7 +32,6 @@ public class ThirdPartyAgent {
 
     private String responsiblePersonName;
 
-//    @DocumentReference(lazy = true, lookup = "{'assuranceCode' :?#{#target}}")
     @DocumentReference(lazy = true)
     private List<AssuranceCode> codes;
 
@@ -77,6 +72,7 @@ public class ThirdPartyAgent {
     }
 
     public ThirdPartyAgent() {
+        // required by Spring Data
     }
 
     @Override

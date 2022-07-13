@@ -17,7 +17,7 @@ public class AssuranceCode {
     @Id
     private String id;
 
-    private String assuranceCode;
+    private String code;
 
     private Instant startDate;
 
@@ -27,8 +27,8 @@ public class AssuranceCode {
         return id;
     }
 
-    public String getAssuranceCode() {
-        return assuranceCode;
+    public String getCode() {
+        return code;
     }
 
     public Instant getStartDate() {
@@ -40,6 +40,7 @@ public class AssuranceCode {
     }
 
     public AssuranceCode() {
+        // required by Spring Data
     }
 
     @Override
@@ -52,20 +53,20 @@ public class AssuranceCode {
 
         AssuranceCode that = (AssuranceCode) o;
 
-        return new EqualsBuilder().append(getId(), that.getId()).append(getAssuranceCode(), that.getAssuranceCode())
+        return new EqualsBuilder().append(getId(), that.getId()).append(getCode(), that.getCode())
                 .append(getStartDate(), that.getStartDate()).append(getEndDate(), that.getEndDate()).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(getId()).append(getAssuranceCode()).append(getStartDate())
+        return new HashCodeBuilder(17, 37).append(getId()).append(getCode()).append(getStartDate())
                 .append(getEndDate()).toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).append("id", id)
-                .append("assuranceCode", assuranceCode).append("startDate", startDate).append("endDate", endDate)
+                .append("assuranceCode", code).append("startDate", startDate).append("endDate", endDate)
                 .toString();
     }
 
@@ -82,7 +83,7 @@ public class AssuranceCode {
         }
 
         public Builder withAssuranceCode(String assuranceCode) {
-            buildSteps.add(data -> data.assuranceCode = assuranceCode);
+            buildSteps.add(data -> data.code = assuranceCode);
             return this;
         }
 
