@@ -9,6 +9,17 @@ clean:
 	rm -rf ./build-*
 	rm -rf ./build.log-*
 
+.PHONY: test-unit
+test-unit: clean
+	mvn test -Dskip.integration.tests=true
+
+.PHONY: test-integration
+test-integration: clean
+	mvn test -Dskip.unit.tests=true
+
+.PHONY: verify
+verify: test-unit test-integration
+
 .PHONY: package
 package:
 ifndef version
