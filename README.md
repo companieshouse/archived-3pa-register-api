@@ -88,3 +88,71 @@ These were added but not used as yet:
 - refer to Confluence pages
 - [specification](https://developer-specs.cidev.aws.chdev.org/third-party-agents-register-api/reference)
 
+## Typical scenario
+With internal app privileges API_KEY in the Authorization header..
+### 1. add 3pa details
+POST `http://api.chs.local/third-party-agencies/3pas`
+with body:
+  ```
+  {
+      "agentName": "Thundercats",
+      "contact_name": "Tim Tom",
+      "email": "a@b.com",
+      "address": {
+          "address_line_1": "1",
+          "address_line_2": "Justice Road",
+          "town": "Cardiff",
+          "county": "NYS",
+          "country": "Wales",
+          "postcode": "111JJ"
+      }
+  }
+  ```
+### 2. add assuranceCode
+POST `http://api.chs.local/third-party-agencies/codes`
+with body:
+  ```
+  {
+      "code": "123",
+      "startDate": "2022-07-08T00:00:00Z"
+  }
+  ```
+### 3. patch new assuranceCode to 3pa
+PATCH `http://api.chs.local/third-party-agencies/3pas/<<3pa_id from self link in step 1>>`
+with body:
+```
+{
+    "codes": [
+        <<self link from step 2>>"
+    ]
+}
+```
+### 4. fetch the 3pa codes
+GET `http://api.chs.local/third-party-agencies/3pas/<<3pa_id from self link in step 1>>/codes`
+for example:
+```
+{
+    "_embedded": {
+        "assuranceCodes": [
+            {
+                "code": "123",
+                "startDate": "2022-07-08T00:00:00Z",
+                "endDate": null,
+                "_links": {
+                    "self": {
+                        "href": "http://api.chs.local/third-party-agencies/codes/62d6bfdbc4f1d449a191fed7"
+                    },
+                    "assuranceCode": {
+                        "href": "http://api.chs.local/third-party-agencies/codes/62d6bfdbc4f1d449a191fed7"
+                    }
+                }
+            }
+        ]
+    },
+    "_links": {
+        "self": {
+            "href": "http://api.chs.local/third-party-agencies/3pas/62d6bd6ac4f1d449a191fed5/codes"
+        }
+    }
+}
+```
